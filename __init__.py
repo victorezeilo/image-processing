@@ -33,7 +33,6 @@ def convertimage(inputpath, outputpath, outputformat, compression):
     img = cv2.imread(inputpath)
     cv2.imwrite(outputpath, img, [outputformat, compression])
 
-    
 def generalargs():
     parser.add_argument('--force', action='store_true', help='Overwrite output file')
 
