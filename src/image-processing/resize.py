@@ -9,38 +9,17 @@ import sys
 import argparse
 import pathlib
 import cv2
+from . import utilities
 
 
 MAX_DIMENSION = 4096
 
 
-def unique_path(path: pathlib.Path) -> pathlib.Path:
-    """Return a non-existing path by appending _1, _2, etc. if needed."""
-    if not path.exists():
-        return path
-    
-    # Append an index to the filename until a unique path is found
-    stem = path.stem
-    suffix = path.suffix
-    parent = path.parent
-    max_iterations = 127
-    for i in range(1, max_iterations):
-        candidate = parent / f"{stem}_{i}{suffix}"
-        if not candidate.exists():
-            return candidate
-    raise RuntimeError(f"Could not find a unique path after {max_iterations} attempts: {path}")
-
-def valid_file(path: str) -> pathlib.Path:
-    """Validate that the given path is a file and return it as a Path object."""
-    p = pathlib.Path(path)
-    if not p.is_file():
-        raise argparse.ArgumentTypeError(f"{path} is not a valid file")
-    return p
 
 def add_resize_arguments(subparsers):
     """Add arguments for the resize command."""
     resize_parser = subparsers.add_parser('resize', help='Resize an image to specified dimensions')
-    resize_parser.add_argument('-s', '--source', type=valid_file, required=True, help='Source image')
+    resize_parser.add_argument('-s', '--source', type=utilities.valid_file, required=True, help='Source image')
     resize_parser.add_argument('-d', '--destination', help='Destination image.')
     resize_parser.add_argument('--width', type=int, required=True, help='Target width of the output image')
     resize_parser.add_argument('--height', type=int, required=True, help='Target height of the output image')
@@ -68,7 +47,7 @@ def validate_resize_arguments(args):
     
     # ensure the destination path is unique if it already exists. If --force is not specified, we will generate a unique path.
     if args.destination.exists() and not getattr(args, 'force', False):
-        args.destination = unique_path(args.destination)
+        args.destination = utilities.unique_path(args.destination)
         
 
 def resize_image(args):
