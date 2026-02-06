@@ -2,6 +2,7 @@ import sys
 import argparse
 import cv2
 import pathlib
+from . import resize
 
 def unique_path(path):
     if not path.exists():
@@ -81,12 +82,21 @@ parser = argparse.ArgumentParser()
 subparsers = parser.add_subparsers(dest='command')
 generalargs()
 parseimageconversionargs()
-args = parser.parse_args()
-if args.command is None:
-    sys.exit("Please provide some arguments.")
-match args.command:
-    case 'convert':
-        validateimageconversioncommands(args)
-        convertimage(args.source, args.destination, args.format, args.compression)
-    case _:
-        print("Argument not recognized.")
+resize.add_resize_arguments(subparsers)
+def main():
+    global args
+    args = parser.parse_args()
+    if args.command is None:
+        sys.exit("Please provide some arguments.")
+    match args.command:
+        case 'convert':
+            validateimageconversioncommands(args)
+            convertimage(args.source, args.destination, args.format, args.compression)
+        case 'resize':
+            resize.validate_resize_arguments(args)
+            resize.resize_image(args)
+        case _:
+            print("Argument not recognized.")
+
+if __name__ == "__main__":
+    main()
