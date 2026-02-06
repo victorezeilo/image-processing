@@ -7,7 +7,7 @@ from . import globals
 def unique_path(path):
     if not path.exists():
         return path
-    stem = path.stemrun
+    stem = path.stem
     suffix = path.suffix
     parent = path.parent
     max_iterations = 127
@@ -17,6 +17,7 @@ def unique_path(path):
         if not candidate.exists():
             return candidate
         i += 1
+    raise RuntimeError("Could not find a unique filename")
 
 def givecorrectdestination(dest, force):
     if dest.exists() and not force:

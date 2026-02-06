@@ -35,20 +35,17 @@ def validate_resize_arguments(args):
     args.source = pathlib.Path(args.source).expanduser().resolve()
     if not args.source.is_file():
         sys.exit(f"Source file does not exist: {args.source}")
-        
-    # determine output path, if not provided, create a default one based on the source filename
+
+    # destination
     if args.destination:
         args.destination = pathlib.Path(args.destination).expanduser()
     else:
-        args.destination = args.source.with_name(args.source.stem + '_resized' + args.source.suffix)
+        args.destination = args.source.with_name(args.source.stem + "_resized" + args.source.suffix)        
 
+    args.destination = pathlib.Path(args.destination).expanduser()
     args.destination = args.destination.resolve()
     args.destination.parent.mkdir(parents=True, exist_ok=True)
     
-    # ensure the destination path is unique if it already exists. If --force is not specified, we will generate a unique path.
-    if args.destination.exists() and not getattr(args, 'force', False):
-        args.destination = utilities.unique_path(args.destination)
-        
 
 def resize_image(args):
     """Resize the image to the specified dimensions."""
@@ -65,8 +62,11 @@ def resize_image(args):
     
     resized_img = cv2.resize(img, (args.width, args.height), interpolation=interp)
     
-    ok = cv2.imwrite(str(args.destination), resized_img)
-    if not ok:
-        sys.exit(f"Failed to write the output image: {args.destination}")
+    # ensure the destination path is unique if it already exists. If --force is not specified, we will generate a unique path.
+    realdest = utilities.givecorrectdestination(args.destination, args.force)
     
-    print(f"Image resized successfully: {args.destination} ({args.width}x{args.height})")
+    ok = cv2.imwrite(str(realdest), resized_img)
+    if not ok:
+        sys.exit(f"Failed to write the output image: {realdest}")
+    
+    print(f"Image resized successfully: {realdest} ({args.width}x{args.height})")
