@@ -9,7 +9,7 @@ import sys
 import argparse
 import pathlib
 import cv2
-from . import utilities
+import utilities
 
 
 MAX_DIMENSION = 4096
