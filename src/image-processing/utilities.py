@@ -2,7 +2,7 @@ import sys
 import argparse
 import cv2
 import pathlib
-from . import globals
+import globals
 
 def unique_path(path):
     if not path.exists():
