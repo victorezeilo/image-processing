@@ -1,5 +1,5 @@
 PY ?= python3
-MODULE ?= src.image_processing
+MODULE ?= src.image_processing.main
 
 SRC ?= test.jpg
 DST ?= out.png

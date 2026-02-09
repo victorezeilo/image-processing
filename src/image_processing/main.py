@@ -2,10 +2,10 @@ import sys
 import argparse
 import cv2
 import pathlib
-import resize
-import convert
-import utilities
-import globals
+from . import globals
+from . import utilities
+from . import convert
+from . import resize
 
 
 #Main here

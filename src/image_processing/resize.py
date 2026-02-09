@@ -9,7 +9,7 @@ import sys
 import argparse
 import pathlib
 import cv2
-import utilities
+from . import utilities
 
 
 MAX_DIMENSION = 4096
@@ -26,6 +26,9 @@ def add_resize_arguments(subparsers):
     
 def validate_resize_arguments(args):
     """Validate the resize arguments."""
+        # Missing parameters
+    if args.width is None or args.height is None:
+        raise ValueError("Width and height must be specified.")
     if args.width <= 0 or args.height <= 0:
         raise ValueError("Width and height must be positive integers.")
     if args.width > MAX_DIMENSION or args.height > MAX_DIMENSION:
@@ -69,4 +72,10 @@ def resize_image(args):
     if not ok:
         sys.exit(f"Failed to write the output image: {realdest}")
     
-    print(f"Image resized successfully: {realdest} ({args.width}x{args.height})")
+    
+    print(f"\n-------------------------------------------------------------------------------------------------------------------")
+    print(f"\t\t\t\t\tImage resized successfully")
+    print(f"-------------------------------------------------------------------------------------------------------------------")
+    print(f"Path: {realdest} ({args.width}x{args.height})")
+    print(f"-------------------------------------------------------------------------------------------------------------------\n")
+
