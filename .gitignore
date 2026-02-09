@@ -20,3 +20,12 @@ htmlcov/
 
 *.jpg
 *.png
+*.jpeg
+*.webp
+*.gif
+
+#pyinstaller
+build/
+dist/
+eye.spec
+report.html
