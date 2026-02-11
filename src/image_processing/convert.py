@@ -2,20 +2,24 @@ import sys
 import argparse
 import cv2
 import pathlib
-from . import utilities
-from . import globals
+import utilities
 
 def convertimage(args):
     realDest = utilities.givecorrectdestination(args.destination, args.force)
     img = cv2.imread(args.source)
     ok = cv2.imwrite(realDest, img, [args.format, args.compression])
     if not ok:
-        sys.exit(f"Failed to write image to {realDest}")
-    print(f"Image converted successfully: {realDest})")
+        utilities.error(f"Failed to write image to {realDest}")
+    print(f"\033[32mImage converted successfully: {realDest} to the format {args.format}\033[0m")
 
 def validateimageconversioncommands(args):
     #VALIDATE INPUT
     formatImg = utilities.determineformat(args)
+    if formatImg is None: #PNG IS DEFAULT
+        formatImg = 'png'
+
+    utilities.validate_supported_format_string(formatImg, "format")
+
     inputFormat = formatImg
     match inputFormat:
         case 'png':
@@ -25,18 +29,19 @@ def validateimageconversioncommands(args):
         case 'jpg' | 'jpeg':
             inputFormat = cv2.IMWRITE_JPEG_QUALITY
         case _:
-            inputFormat = cv2.IMWRITE_PNG_COMPRESSION #PNG IS DEFAULT
-    if formatImg is None: #PNG IS DEFAULT
-        formatImg = 'png'
-    args.source = pathlib.Path(args.source).expanduser().resolve()
-    if not args.source.is_file():
-        sys.exit(f"Source file does not exist: {args.source}")
+            inputFormat = cv2.IMWRITE_PNG_COMPRESSION #SHOULD NOT HAPPEN ANYWAY
+
+    args.source = utilities.normalize_source(args.source)
+    utilities.validate_supported_format(args.source, "source")
+
     if args.destination:
-        args.destination = pathlib.Path(args.destination).expanduser()
+        suffix = f".{formatImg}"
     else:
-        args.destination = args.source.with_name(args.source.stem + "_converted." + formatImg)
-    args.destination = args.destination.resolve()
-    args.destination.parent.mkdir(parents=True, exist_ok=True)
+        suffix = f"_converted.{formatImg}"
+
+    args.destination = utilities.prepare_destination(args.destination, args.source, suffix)
+    utilities.validate_supported_format(args.source, "destination")
+
     args.format = inputFormat
     COMPRESSION_MAP = {
             'png': {
@@ -62,11 +67,11 @@ def validateimageconversioncommands(args):
     }
     args.compression = COMPRESSION_MAP[formatImg][args.compression]
 
-def parseimageconversionargs(subparsers):
+def parseimageconversionargs(subparsers, parent):
     #IMAGE CONVERSION
-    convert_parser = subparsers.add_parser('convert', help='Convert image format')
+    convert_parser = subparsers.add_parser('convert', help='Convert image format', parents=[parent])
     convert_parser.add_argument('-s', '--source', type=utilities.valid_file, required=True, help='Source image')
     convert_parser.add_argument('-d', '--destination', help='Destination image.')
-    convert_parser.add_argument('-f', '--format', choices=['png', 'jpg', 'jpeg', 'tiff'], help='Output format.')
+    convert_parser.add_argument('-f', '--format', help='Output format.')
     LEVELS = ('low', 'medium', 'high')
     convert_parser.add_argument('-c', '--compression', choices=LEVELS, default='medium', help='Compression level (low, medium, high')

@@ -2,18 +2,17 @@ import sys
 import argparse
 import cv2
 import pathlib
-from . import globals
-from . import utilities
-from . import convert
-from . import resize
-
+import resize
+import convert
+import utilities
 
 #Main here
-subparsers = globals.parser.add_subparsers(dest='command')
-utilities.generalargs()
-convert.parseimageconversionargs(subparsers)
-resize.add_resize_arguments(subparsers)
-args = globals.parser.parse_args()
+parser = argparse.ArgumentParser()
+common = utilities.generalargs()
+subparsers = parser.add_subparsers(dest='command')
+convert.parseimageconversionargs(subparsers, common)
+resize.add_resize_arguments(subparsers, common)
+args = parser.parse_args()
 def main():
     if args.command is None:
         sys.exit("Please provide some arguments.")

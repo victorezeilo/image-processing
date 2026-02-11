@@ -9,16 +9,16 @@ import sys
 import argparse
 import pathlib
 import cv2
-from . import utilities
+import utilities
 
 
 MAX_DIMENSION = 4096
 
 
 
-def add_resize_arguments(subparsers):
+def add_resize_arguments(subparsers, parent):
     """Add arguments for the resize command."""
-    resize_parser = subparsers.add_parser('resize', help='Resize an image to specified dimensions')
+    resize_parser = subparsers.add_parser('resize', help='Resize an image to specified dimensions', parents=[parent])
     resize_parser.add_argument('-s', '--source', type=utilities.valid_file, required=True, help='Source image')
     resize_parser.add_argument('-d', '--destination', help='Destination image.')
     resize_parser.add_argument('--width', type=int, required=True, help='Target width of the output image')
@@ -26,35 +26,24 @@ def add_resize_arguments(subparsers):
     
 def validate_resize_arguments(args):
     """Validate the resize arguments."""
-        # Missing parameters
-    if args.width is None or args.height is None:
-        raise ValueError("Width and height must be specified.")
     if args.width <= 0 or args.height <= 0:
-        raise ValueError("Width and height must be positive integers.")
+        utilities.error("Width and height must be positive integers.")
     if args.width > MAX_DIMENSION or args.height > MAX_DIMENSION:
-        raise ValueError(f"Width and height must not exceed {MAX_DIMENSION}.")
+        utilities.error(f"Width and height must not exceed {MAX_DIMENSION}.")
     
     # validate source path
-    args.source = pathlib.Path(args.source).expanduser().resolve()
-    if not args.source.is_file():
-        sys.exit(f"Source file does not exist: {args.source}")
+    args.source = utilities.normalize_source(args.source)
+    utilities.validate_supported_format(args.source, "source")
 
     # destination
-    if args.destination:
-        args.destination = pathlib.Path(args.destination).expanduser()
-    else:
-        args.destination = args.source.with_name(args.source.stem + "_resized" + args.source.suffix)        
-
-    args.destination = pathlib.Path(args.destination).expanduser()
-    args.destination = args.destination.resolve()
-    args.destination.parent.mkdir(parents=True, exist_ok=True)
-    
+    args.destination = utilities.prepare_destination(args.destination, args.source, "_resized" + args.source.suffix)
+    utilities.validate_supported_format(args.source, "destination")
 
 def resize_image(args):
     """Resize the image to the specified dimensions."""
     img = cv2.imread(str(args.source))
     if img is None:
-        sys.exit(f"Failed to read the source image: {args.source}")
+        utilities.error(f"Failed to read the source image: {args.source}")
     
     # choose interpolation: area for shrinking, linear for enlarging
     h, w = img.shape[:2]
@@ -70,12 +59,6 @@ def resize_image(args):
     
     ok = cv2.imwrite(str(realdest), resized_img)
     if not ok:
-        sys.exit(f"Failed to write the output image: {realdest}")
+        utilities.error(f"Failed to write the output image: {realdest}")
     
-    
-    print(f"\n-------------------------------------------------------------------------------------------------------------------")
-    print(f"\t\t\t\t\tImage resized successfully")
-    print(f"-------------------------------------------------------------------------------------------------------------------")
-    print(f"Path: {realdest} ({args.width}x{args.height})")
-    print(f"-------------------------------------------------------------------------------------------------------------------\n")
-
+    print(f"\033[32mImage resized successfully: {realdest} ({args.width}x{args.height}\033[0m)")
