@@ -37,7 +37,7 @@ def validate_resize_arguments(args):
 
     # destination
     args.destination = utilities.prepare_destination(args.destination, args.source, "_resized" + args.source.suffix)
-    utilities.validate_supported_format(args.source, "destination")
+    utilities.validate_supported_format(args.destination, "destination")
 
 def resize_image(args):
     """Resize the image to the specified dimensions."""

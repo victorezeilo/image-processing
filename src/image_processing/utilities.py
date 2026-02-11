@@ -45,10 +45,17 @@ def givecorrectdestination(dest, force):
 
 def determineformat(args):
     if args.format:
-        return args.format
+        formatImg = args.format.lower()
+        if args.destination:
+            dest_ext = get_extension(args.destination)
+            if dest_ext and dest_ext != formatImg:
+                error(f"Destination extension '.{dest_ext}' does not match the format {formatImg}")
+        return formatImg
     if args.destination:
-        return pathlib.Path(args.destination).suffix.lstrip('.')
-    return None
+        dest_ext = get_extension(args.destination)
+        if dest_ext:
+            return dest_ext.lower()
+    return 'png'
 
 def generalargs():
     common = argparse.ArgumentParser(add_help=False)
@@ -62,6 +69,7 @@ def valid_file(path):
     return p
 
 def get_extension(path):
+    path = pathlib.Path(path)
     return path.suffix.lower().lstrip('.')
 
 def validate_supported_format_string(fmt, role):

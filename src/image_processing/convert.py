@@ -4,20 +4,17 @@ import cv2
 import pathlib
 import utilities
 
-def convertimage(args):
+def convertimage(args, formatImg):
     realDest = utilities.givecorrectdestination(args.destination, args.force)
     img = cv2.imread(args.source)
     ok = cv2.imwrite(realDest, img, [args.format, args.compression])
     if not ok:
         utilities.error(f"Failed to write image to {realDest}")
-    print(f"\033[32mImage converted successfully: {realDest} to the format {args.format}\033[0m")
+    print(f"\033[32mImage converted successfully: {realDest} to the format {formatImg}\033[0m")
 
-def validateimageconversioncommands(args):
+def validatecommandsandconvert(args):
     #VALIDATE INPUT
     formatImg = utilities.determineformat(args)
-    if formatImg is None: #PNG IS DEFAULT
-        formatImg = 'png'
-
     utilities.validate_supported_format_string(formatImg, "format")
 
     inputFormat = formatImg
@@ -40,7 +37,7 @@ def validateimageconversioncommands(args):
         suffix = f"_converted.{formatImg}"
 
     args.destination = utilities.prepare_destination(args.destination, args.source, suffix)
-    utilities.validate_supported_format(args.source, "destination")
+    utilities.validate_supported_format(args.destination, "destination")
 
     args.format = inputFormat
     COMPRESSION_MAP = {
@@ -66,6 +63,7 @@ def validateimageconversioncommands(args):
                     }
     }
     args.compression = COMPRESSION_MAP[formatImg][args.compression]
+    convertimage(args, formatImg)
 
 def parseimageconversionargs(subparsers, parent):
     #IMAGE CONVERSION

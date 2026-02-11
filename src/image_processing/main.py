@@ -18,8 +18,7 @@ def main():
         sys.exit("Please provide some arguments.")
     match args.command:
         case 'convert':
-            convert.validateimageconversioncommands(args)
-            convert.convertimage(args)
+            convert.validatecommandsandconvert(args) #Easier for now to have it in one function
         case 'resize':
             resize.validate_resize_arguments(args)
             resize.resize_image(args)
