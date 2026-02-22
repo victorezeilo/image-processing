@@ -4,8 +4,7 @@ import argparse
 import pathlib
 import cv2
 
-MAX_KERNEL = 99  # keep reasonable (must be odd)
-
+MAX_KERNEL = 99
 
 def unique_path(path: pathlib.Path) -> pathlib.Path:
     """Return a non-existing path by appending _1, _2, ... if needed."""
