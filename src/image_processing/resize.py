@@ -9,7 +9,7 @@ import sys
 import argparse
 import pathlib
 import cv2
-import utilities
+from . import utilities
 
 
 MAX_DIMENSION = 4096
@@ -26,8 +26,20 @@ def add_resize_arguments(subparsers, parent):
     
 def validate_resize_arguments(args):
     """Validate the resize arguments."""
+    if args.width is None or args.height is None:
+        utilities.error("Width and height are required.")
+
+    # 2) wrong types (tests allow ValueError or TypeError)
+    if not isinstance(args.width, int) or not isinstance(args.height, int):
+        raise TypeError("Width and height must be integers.")
+
+    # 3) invalid values: MUST raise for 0 or negative
     if args.width <= 0 or args.height <= 0:
         utilities.error("Width and height must be positive integers.")
+
+    # 4) max dimension (keep your constant name)
+    max_dim = getattr(args, "MAX_DIMENSION", None)  # ignore if you don't use
+    # better: use your module constant
     if args.width > MAX_DIMENSION or args.height > MAX_DIMENSION:
         utilities.error(f"Width and height must not exceed {MAX_DIMENSION}.")
     
