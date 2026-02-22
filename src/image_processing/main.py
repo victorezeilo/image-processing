@@ -2,9 +2,10 @@ import sys
 import argparse
 import cv2
 import pathlib
-import resize
-import convert
-import utilities
+from . import resize
+from . import convert
+from . import utilities
+from . import blur
 
 #Main here
 parser = argparse.ArgumentParser()
@@ -12,6 +13,7 @@ common = utilities.generalargs()
 subparsers = parser.add_subparsers(dest='command')
 convert.parseimageconversionargs(subparsers, common)
 resize.add_resize_arguments(subparsers, common)
+blur.add_blur_parser(subparsers)
 args = parser.parse_args()
 def main():
     if args.command is None:
@@ -22,6 +24,9 @@ def main():
         case 'resize':
             resize.validate_resize_arguments(args)
             resize.resize_image(args)
+        case "blur":
+            blur.validate_blur_args(args)
+            blur.blur_image(args)
         case _:
             print("Argument not recognized.")
 
