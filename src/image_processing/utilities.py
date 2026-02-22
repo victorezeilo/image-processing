@@ -36,7 +36,7 @@ def prepare_destination(dest_str: str | None, source: pathlib.Path, suffix: str)
     return dest
 
 def error(msg):
-        sys.exit(f"\033[31m{msg}\033[0m")
+    raise ValueError(msg)   
 
 def givecorrectdestination(dest, force):
     if dest.exists() and not force:

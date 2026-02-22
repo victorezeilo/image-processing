@@ -2,7 +2,7 @@ import sys
 import argparse
 import cv2
 import pathlib
-import utilities
+from . import utilities
 
 def convertimage(args, formatImg):
     realDest = utilities.givecorrectdestination(args.destination, args.force)
