@@ -5,7 +5,7 @@ import pathlib
 
 try:
     # Running as a module: python -m src.image_processing.main
-    from . import resize, convert, utilities
+    from . import resize, convert, utilities, sharpen, recolour
 except ImportError:
     # Running as a script: python src/image_processing/main.py
     import os
@@ -14,7 +14,7 @@ except ImportError:
     if repo_root not in sys.path:
         sys.path.insert(0, repo_root)
 
-    from src.image_processing import resize, convert, utilities
+    from src.image_processing import resize, convert, utilities, sharpen, recolour
 
 # Main here
 parser = argparse.ArgumentParser()
@@ -22,6 +22,8 @@ common = utilities.generalargs()
 subparsers = parser.add_subparsers(dest='command')
 convert.parseimageconversionargs(subparsers, common)
 resize.add_resize_arguments(subparsers, common)
+sharpen.add_sharpen_arguments(subparsers, common)
+recolour.add_recolour_arguments(subparsers, common)
 args = parser.parse_args()
 
 def main():
@@ -33,6 +35,12 @@ def main():
         case 'resize':
             resize.validate_resize_arguments(args)
             resize.resize_image(args)
+        case "sharpen":
+            sharpen.validate_sharpen_arguments(args)
+            sharpen.sharpen_image(args)
+        case "recolour":
+            recolour.validate_recolour_arguments(args)
+            recolour.recolour_image(args)
         case _:
             print("Argument not recognized.")
 
