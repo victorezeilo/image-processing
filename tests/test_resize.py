@@ -54,10 +54,6 @@ def test_resize_success(tmp_path: Path):
     w, h = _read_image_dim(output_path)
     assert (w, h) == (800, 600), f"Expected dimensions (800, 600), got ({w}, {h})"
     
-# 2. not possibe
-@pytest.mark.xfail(reason="We are not implementing Aspect ratio preservation in the resize command.")
-def test_aspect_ratio():
-    pass
 
 # 3. test minimum dimensions
 def test_min_dimensions(tmp_path: Path):
