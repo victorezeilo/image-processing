@@ -22,6 +22,7 @@ common = utilities.generalargs()
 subparsers = parser.add_subparsers(dest='command')
 convert.parseimageconversionargs(subparsers, common)
 resize.add_resize_arguments(subparsers, common)
+blur.add_blur_parser(subparsers)
 sharpen.add_sharpen_arguments(subparsers, common)
 recolour.add_recolour_arguments(subparsers, common)
 args = parser.parse_args()
@@ -35,6 +36,9 @@ def main():
         case 'resize':
             resize.validate_resize_arguments(args)
             resize.resize_image(args)
+        case "blur":
+            blur.validate_blur_args(args)
+            blur.blur_image(args)
         case "sharpen":
             sharpen.validate_sharpen_arguments(args)
             sharpen.sharpen_image(args)

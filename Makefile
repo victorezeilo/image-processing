@@ -8,6 +8,7 @@ COMP ?= 3
 
 WIDTH ?= 800
 HEIGHT ?= 600
+KERNEL ?= 41
 
 .PHONY: help convert resize test install clean
 
@@ -17,6 +18,9 @@ convert:
 
 resize:
 	$(PY) -m $(MODULE) resize --source "$(SRC)" --width "$(WIDTH)" --height "$(HEIGHT)"
+
+blur:
+	$(PY) -m $(MODULE) blur --source "$(SRC)" --kernel "$(KERNEL)"
 
 test:
 	$(PY) -m pytest -q
