@@ -8,7 +8,7 @@ except ImportError:
     import utilities
 
 
-MAX_LEVEL = 5.0
+MAX_LEVEL = 15.0
 MAX_RADIUS = 25
 
 

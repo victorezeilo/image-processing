@@ -14,7 +14,7 @@ except ImportError:
     if repo_root not in sys.path:
         sys.path.insert(0, repo_root)
 
-    from src.image_processing import resize, convert, utilities, sharpen, recolour
+from src.image_processing import resize, convert, utilities, sharpen, recolour, blur
 
 # Main here
 parser = argparse.ArgumentParser()

@@ -9,6 +9,11 @@ COMP ?= 3
 WIDTH ?= 800
 HEIGHT ?= 600
 KERNEL ?= 41
+LEVEL ?= 7.0
+RADIUS ?= 8
+MODE ?= colorize
+# colorize
+# grayscale
 
 .PHONY: help convert resize test install clean
 
@@ -22,8 +27,15 @@ resize:
 blur:
 	$(PY) -m $(MODULE) blur --source "$(SRC)" --kernel "$(KERNEL)"
 
+sharpen:
+	$(PY) -m $(MODULE) sharpen --source "$(SRC)" --level "$(LEVEL)" --radius "$(RADIUS)"
+
+recolour:
+	$(PY) -m $(MODULE) recolour --source "$(SRC)" --mode "$(MODE)"
+
+
 test:
-	$(PY) -m pytest -q
+	$(PY) -m pytest -v
 
 clean:
 	rm -rf __pycache__ .pytest_cache .coverage htmlcov
