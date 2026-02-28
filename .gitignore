@@ -29,3 +29,7 @@ build/
 dist/
 eye.spec
 report.html
+
+.history/
+python
+*.txt
