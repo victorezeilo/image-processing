@@ -1,13 +1,13 @@
 import cv2
+import numpy as np
 
 try:
     from . import utilities
 except ImportError:
     import utilities
 
-
 DEFAULT_POS = "bottom-right"
-DEFAULT_OPACITY = 0.35
+DEFAULT_OPACITY = 0.2
 DEFAULT_SCALE = 1.0
 DEFAULT_MARGIN = 10
 DEFAULT_THICKNESS = 2
@@ -30,9 +30,11 @@ def add_watermark_arguments(subparsers, parent):
     p.add_argument("--scale", type=float, default=DEFAULT_SCALE, help="Font scale")
     p.add_argument("--margin", type=int, default=DEFAULT_MARGIN, help="Margin in pixels")
 
+    p.add_argument("--color", default="255,255,255", help="Text color in RGB format, e.g., 255,0,0 for red")
+    p.add_argument("--angle", type=float, default=0.0, help="Rotation angle in degrees (e.g., 45 or 135)")
+
 
 def validate_watermark_arguments(args):
-    # numeric validation
     if not isinstance(args.opacity, (int, float)):
         raise TypeError("opacity must be a number")
     if args.opacity < 0 or args.opacity > 1:
@@ -48,7 +50,18 @@ def validate_watermark_arguments(args):
     if args.margin < 0:
         utilities.error("margin must be >= 0.")
 
-    # file validation + destination handling (SAME AS recolour.py)
+    if not isinstance(args.angle, (int, float)):
+        raise TypeError("angle must be a number")
+
+    # RGB to BGR
+    try:
+        r, g, b = map(int, args.color.split(','))
+        if not (0 <= r <= 255 and 0 <= g <= 255 and 0 <= b <= 255):
+            raise ValueError
+        args.color_bgr = (b, g, r)  # 翻转为 BGR
+    except ValueError:
+        utilities.error("Color must be in 'R,G,B' format (e.g., 255,0,0). Values must be 0-255.")
+
     args.source = utilities.normalize_source(args.source)
     utilities.validate_supported_format(args.source, "source")
 
@@ -80,7 +93,6 @@ def _compute_position(img, text, font, scale, thickness, pos, margin):
         x = (w - tw) // 2
         y = (h + th) // 2
 
-    # keep inside bounds
     x = max(0, min(x, w - tw))
     y = max(th, min(y, h))
     return x, y
@@ -91,42 +103,30 @@ def watermark_image(args):
     if img is None:
         utilities.error(f"Failed to read the source image: {args.source}")
 
-    overlay = img.copy()
+    h, w = img.shape[:2]
+
+    text_canvas = np.zeros((h, w, 3), dtype=np.uint8)
     font = cv2.FONT_HERSHEY_SIMPLEX
 
-    x, y = _compute_position(
-        img,
-        args.text,
-        font,
-        args.scale,
-        DEFAULT_THICKNESS,
-        args.pos,
-        args.margin,
-    )
+    x, y = _compute_position(img, args.text, font, args.scale, DEFAULT_THICKNESS, args.pos, args.margin)
 
-    # draw text with small shadow for visibility
-    cv2.putText(
-        overlay,
-        args.text,
-        (x + 2, y + 2),
-        font,
-        args.scale,
-        (0, 0, 0),
-        DEFAULT_THICKNESS + 1,
-        cv2.LINE_AA,
-    )
-    cv2.putText(
-        overlay,
-        args.text,
-        (x, y),
-        font,
-        args.scale,
-        (255, 255, 255),
-        DEFAULT_THICKNESS,
-        cv2.LINE_AA,
-    )
+    cv2.putText(text_canvas, args.text, (x + 2, y + 2), font, args.scale, (0, 0, 0), DEFAULT_THICKNESS + 1, cv2.LINE_AA)
+    cv2.putText(text_canvas, args.text, (x, y), font, args.scale, args.color_bgr, DEFAULT_THICKNESS, cv2.LINE_AA)
 
-    out_img = cv2.addWeighted(overlay, float(args.opacity), img, 1 - float(args.opacity), 0)
+    if args.angle != 0:
+        (tw, th), _ = cv2.getTextSize(args.text, font, args.scale, DEFAULT_THICKNESS)
+        center_x = x + tw // 2
+        center_y = y - th // 2
+
+        rotation_matrix = cv2.getRotationMatrix2D((center_x, center_y), args.angle, 1.0)
+        text_canvas = cv2.warpAffine(text_canvas, rotation_matrix, (w, h))
+
+    mask = np.any(text_canvas != 0, axis=-1).astype(np.float32)
+    mask = np.expand_dims(mask, axis=-1)
+
+    out_img = img.astype(np.float32) * (1 - mask * args.opacity) + text_canvas.astype(np.float32) * (
+                mask * args.opacity)
+    out_img = np.clip(out_img, 0, 255).astype(np.uint8)
 
     out_path = utilities.givecorrectdestination(args.destination, args.force)
 

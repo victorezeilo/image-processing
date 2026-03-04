@@ -91,9 +91,13 @@ def run_watermark():
     text = input("Watermark text: ").strip()
     pos = (input("Position (top-left/top-right/bottom-left/bottom-right/center) [bottom-right]: ").strip()
            or "bottom-right")
-    opacity = float(input("Opacity 0..1 [0.5]: ").strip() or "0.5")
+    opacity = float(input("Opacity 0..1 [0.2]: ").strip() or "0.2")
     scale = float(input("Scale [1.0]: ").strip() or "1.0")
     margin = int(input("Margin [10]: ").strip() or "10")
+
+    color = input("Color (R,G,B) [255,255,255 for white]: ").strip() or "255,255,255"
+    angle = float(input("Rotation angle [0 for horizontal]: ").strip() or "0")
+
     force = _ask_yes_no("Force overwrite?", default=False)
 
     args = argparse.Namespace(
@@ -104,6 +108,8 @@ def run_watermark():
         opacity=opacity,
         scale=scale,
         margin=margin,
+        color=color,
+        angle=angle,
         force=force,
     )
     watermark.validate_watermark_arguments(args)
@@ -187,7 +193,7 @@ def main():
             print("Exiting...")
             sys.exit(0)
         else:
-            print("Invalid choice. Please choose 1-9.")
+            print("Invalid choice. Please choose 1-8.")
 
 
 if __name__ == "__main__":
