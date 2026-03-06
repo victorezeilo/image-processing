@@ -32,17 +32,24 @@ def _run_safely(fn):
 def run_blur():
     src = input("Source image path: ").strip()
     dst = _ask_optional("Destination path")
-    radius = int(input("Blur radius [5]: ").strip() or "5")
+    kernel = int(input("Blur kernel [15]: ").strip() or "15")
     force = _ask_yes_no("Force overwrite?", default=False)
 
     args = argparse.Namespace(
         source=src,
         destination=dst,
-        radius=radius,
+        kernel=kernel,
         force=force,
     )
-    blur.validate_blur_arguments(args)
-    blur.blur_image(args)
+    if hasattr(blur, "validatecommandsandblur"):
+        blur.validatecommandsandblur(args)
+    elif hasattr(blur, "validate_blur_arguments") and hasattr(blur, "blur_image"):
+        blur.validate_blur_arguments(args)
+        blur.blur_image(args)
+    elif hasattr(blur, "blur_image"):
+        blur.blur_image(args)
+    else:
+        raise AttributeError("Could not find a runnable blur function in blur.py")
 
 
 def run_sharpen():
@@ -137,17 +144,22 @@ def run_resize():
 def run_convert():
     src = input("Source image path: ").strip()
     dst = _ask_optional("Destination path")
-    fmt = (input("Format (png/jpg/jpeg/tiff) [png]: ").strip() or None)
+    fmt = (input("Format (png/jpg/jpeg/tiff) [png]: ").strip() or "png")
+    compression = (input("Compression (low/medium/high) [medium]: ").strip() or "medium")
     force = _ask_yes_no("Force overwrite?", default=False)
 
-    # convert.validatecommandsandconvert expects these fields
     args = argparse.Namespace(
         source=src,
         destination=dst,
         format=fmt,
+        compression=compression,
         force=force,
     )
-    convert.validatecommandsandconvert(args)
+
+    try:
+        convert.validatecommandsandconvert(args)
+    except SystemExit as e:
+        raise ValueError(str(e) if str(e) else "Convert command failed")
     
 def run_undo():
     target = input("File to undo (restore previous version): ").strip()
