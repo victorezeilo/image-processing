@@ -1,7 +1,7 @@
 PY ?= python3
 MODULE ?= src.image_processing.main
 
-SRC ?= test.jpg
+SRC ?= lara.png
 DST ?= out.png
 FMT ?= png
 COMP ?= 3
@@ -11,7 +11,7 @@ HEIGHT ?= 600
 KERNEL ?= 41
 LEVEL ?= 7.0
 RADIUS ?= 8
-MODE ?= colorize
+MODE ?= graycscale
 # colorize
 # grayscale
 

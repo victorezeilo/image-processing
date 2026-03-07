@@ -1,0 +1,55 @@
+OPEN CMD : 
+FROM THE REPO DIRECTORY DRIVE 
+
+CMD TO ACTIVATE VIRTUAL ENV FOR  PYTHON IN CMD :
+
+.venv\Scripts\activate
+
+STEPS TO WATERMARK AN IMAGE : 
+
+MOST VISIBLE : python -m src.image_processing.main watermark -s image.jpg --text "GROUP 6" --pos top-left --opacity 1 --scale 10.5 --margin 50 --force
+
+NOTE : REPLACE image.jpg WITH THE REAL FILE NAME IN THE ABOVE COMMAND
+
+WATERMARK AT THE CENTER OF THE IMAAGE : python -m src.image_processing.main watermark -s test.jpg --text "GROUP 6" --pos center --opacity 1 --scale 10.5 --margin 50 --force
+
+Change watermark position ACCORDING TO THE REQUIREMENT 
+
+Top-left
+Top-right
+Bottom-left
+Bottom-right
+
+NOTE : IMPLEMENTATION OF DIAGONAL WATERMARK IS PENDING FOR DEV
+
+STEPS TO UNDO AN IMAGE :
+
+THIS ONLY WORKS WHEN A CHANGE IS MADE TO AN IMAGE : i.e. NEED TO MAKE CHANGES TO A TEST FILE AND REPEAT THE SAME COMMAND AGAIN TO CREATE A BACK UP OR TEST IMAGE TO IMPLEMENT UNDO IMAGE
+AFTER MAKING CHANGES TO AN IMAGE :
+
+EXAMPLE: YOU HAVE A TEST IMAGE NAMED test.png YOU NEED TO IMPLEMENT A FETURE LIKE WATERMARK THE test.png FIRST AND CREATE A BACKUP BY OVERWRITING THE FILE USING AND RUNNING THE SAME COMMAND AGAIN TO CREATE A BACKUPLATER CAN UNDO IT USING
+
+COMMAND 1 : python -m src.image_processing.main watermark -s test.jpg --text "RAHUL RAICHUR" --pos top-left --opacity 1 --scale 10.5 --margin 50 --force
+ 
+COMMAND 2 : python -m src.image_processing.main watermark -s test.jpg --text "RAHUL RAICHUR" --pos top-left --opacity 1 --scale 10.5 --margin 50 --force
+(SAME AS COMMAND 1 RUN IT AGIN TO CREATE A BACKUP)
+
+UNDO :  python -m src.image_processing.main undo -s test_watermarked.png 
+
+NOTES / LIMITATIONS
+
+1)  Undo only restores ONE step back each time you run it. Run undo
+    repeatedly to step back multiple versions (if multiple backups
+    exist).
+
+2)  Undo requires that a file was overwritten (destination existed) with
+    –force. If you always write to a new filename, there is nothing to
+    undo.
+
+3)  Backups are stored in .history. You can delete that folder to reset
+    undo history.
+
+MENU COMMAND: python -m src.image_processing.menu
+
+AFTER SELECTING ALL THE OPTIONS AND PARAMETERS WE GET A PROMPT : Force overwrite? (y/n) [n]: select "n" to avoid overwriting
+
