@@ -5,7 +5,7 @@ import pathlib
 
 try:
     # Running as a module: python -m src.image_processing.main
-    from . import resize, convert, utilities, sharpen, recolour, watermark, undo
+    from . import menu, resize, convert, utilities, sharpen, recolour, watermark, undo
 except ImportError:
     # Running as a script: python src/image_processing/main.py
     import os
@@ -14,7 +14,7 @@ except ImportError:
     if repo_root not in sys.path:
         sys.path.insert(0, repo_root)
 
-from src.image_processing import resize, convert, utilities, sharpen, recolour, blur, watermark, undo
+from src.image_processing import menu, resize, convert, utilities, sharpen, recolour, blur, watermark, undo
 
 # Main here
 parser = argparse.ArgumentParser()
@@ -27,11 +27,18 @@ sharpen.add_sharpen_arguments(subparsers, common)
 recolour.add_recolour_arguments(subparsers, common)
 watermark.add_watermark_arguments(subparsers, common)
 undo.add_undo_arguments(subparsers, common)
+parser.add_argument("--menu", action="store_true", help="Start interactive menu")
 args = parser.parse_args()
 
 def main():
+    if len(sys.argv) == 1:
+        menu.main()
+        return
     if args.command is None:
-        sys.exit("Please provide some arguments.")
+        print("No command given. Starting menu...\"")
+        menu.main()
+        return
+        # sys.exit("Please provide some arguments.")
     match args.command:
         case 'convert':
             convert.validatecommandsandconvert(args)  # Easier for now to have it in one function
