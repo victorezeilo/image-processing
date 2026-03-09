@@ -82,5 +82,5 @@ def blur_image(args):
     if not ok:
         sys.exit(f"Error: could not write output image to: {args.destination}")
 
-    print(f"\033[32mImage Blured successfully")
+    print(f"\033[32mImage Blured successfully\033[0m")
     

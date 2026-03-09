@@ -41,15 +41,8 @@ def run_blur():
         kernel=kernel,
         force=force,
     )
-    if hasattr(blur, "validatecommandsandblur"):
-        blur.validatecommandsandblur(args)
-    elif hasattr(blur, "validate_blur_arguments") and hasattr(blur, "blur_image"):
-        blur.validate_blur_arguments(args)
-        blur.blur_image(args)
-    elif hasattr(blur, "blur_image"):
-        blur.blur_image(args)
-    else:
-        raise AttributeError("Could not find a runnable blur function in blur.py")
+    blur.validate_blur_args(args)
+    blur.blur_image(args)
 
 
 def run_sharpen():
